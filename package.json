@@ -1,0 +1,77 @@
+{
+  "name": "att.webrtc.sample",
+  "version": "2.0.0-beta",
+  "description": "Enhanced WebRTC Sample Application built with AT&T Enhanced WebRTC JS SDK",
+  "homepage": "https://developer.att.com",
+  "keywords": [
+    "Enhanced WebRTC",
+    "AT&T"
+  ],
+  "license": "AT&T. Uses 3rd party libraries. See 3P-LICENSES.txt for attribution",
+  "author": "AT&T Developer Program, DRT/LTA",
+  "private": true,
+  "files": [
+    "sample.cert",
+    "sample.key",
+    "README.md",
+    "RELEASE.md",
+    "3P-LICENSES.txt",
+    "lib",
+    "fresh-start.sh"
+  ],
+  "scripts": {
+    "start": "nodejs app.js sandbox"
+  },
+  "engines": {
+    "node": "0.11.*"
+  },
+  "http_port": 9000,
+  "https_port": 9001,
+  "cert_file": "sample.cert",
+  "key_file": "sample.key",
+  "logs_dir": "logs",
+  "cors_domains": [
+    "your.test.com:9001",
+    "*.prod.com:9001",
+    "*.sandbox.myapp.com:9001",
+    "0.0.0.0:9001",
+    "0.0.0.0:9000",
+    "localhost",
+    "localhost:9001",
+    "127.0.0.1:9001"
+  ],
+  "default_api_env": "sandbox",
+  "sandbox": {
+    "app_key": "",
+    "app_secret": "",
+    "oauth_callback": "http://0.0.0.0:9000/oauth/callback",
+    "app_token_url": "http://0.0.0.0:9000/tokens",
+    "app_e911id_url": "http://0.0.0.0:9000/e911ids",
+    "virtual_numbers_pool": [
+      "1-312-0000000"
+    ],
+    "ewebrtc_domain": ""
+  },
+  "prod": {
+    "app_key": "<your-app-key>",
+    "app_secret": "<your-app-secret>",
+    "oauth_callback": "https://127.0.0.1:9001/oauth/callback",
+    "app_token_url": "https://127.0.0.1:9001/tokens",
+    "app_e911id_url": "https://127.0.0.1:9001/e911ids",
+    "virtual_numbers_pool": [
+      "number1",
+      "number2",
+      "number3"
+    ],
+    "ewebrtc_domain": "<your-ewebrtc-domain>"
+  },
+  "dependencies": {
+    "att-dhs": "stable",
+    "body-parser": "~1.0.0",
+    "express": "~4.2.0",
+    "hjs": "~0.0.6",
+    "restify": "^2.8.5",
+    "socket.io": "^1.3.5",
+    "static-favicon": "~1.0.0"
+  }
+}

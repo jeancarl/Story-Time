@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head lang='en'>
+<meta charset='UTF-8'>
+</head>
+<body>
+<header>Enhanced WebRTC DevLab</header>
+
+<p> 
+    <input type='text' id='UsernameText' value=''>@
+    <span id='ewebrtcDomainSpan'>Loading...</span>
+</p>
+
+<p>
+    <span id='statusLabel'></span>
+</p>
+
+<p>
+    <button id='LoginButton' onclick='login()'>Login</button>
+    <button id='LogoutButton' onclick='logout()'>Logout</button>
+</p>
+
+<p>
+    <input type='text' id='callToText' 
+         placeholder='Account ID/Telephone' hidden>
+    <button id='makeCallButton' onclick='makeCall()' 
+         hidden>Make Call</button>
+    <button id='endCallButton' onclick='endCall()' 
+         hidden>End Call</button>
+    <button id='answerCallButton' onclick='answerCall()' 
+          hidden>Answer Call</button>
+</p>
+
+<p> 
+    <video id='remoteVideo' width='320' height='240' ></video>
+    <video id='localVideo' width='64' height='48' ></video>
+</p>
+<p>
+    <button id='holdCallButton' onclick='holdCall()' 
+        hidden>Hold Call</button>
+    <button id='resumeCallButton' onclick='resumeCall()' 
+        hidden>Resume Call</button>
+    <button id='muteCallButton' onclick='muteCall()' 
+        hidden>Mute Call</button>
+    <button id='unmuteCallButton' onclick='unmuteCall()' 
+        hidden>Unmute Call</button>
+</p>
+
+<script src='//code.jquery.com/jquery-2.1.1.min.js'></script>
+<script type='text/javascript' src='/js/ewebrtc-sdk.min.js'></script>   
+<script type='text/javascript'>
+// Global variables
+var myDHS = 'http://0.0.0.0:9000',
+  ewebrtc_domain,
+  app_token_url,
+  phone,
+  accessToken;
+
+// Create a phone object and register events
+phone = ATT.rtc.Phone.getPhone();
+phone.on('error', onError);  
+phone.on('session:ready', onLoginSuccess);
+phone.on('session:disconnected', onLogout);
+phone.on('call:connected', onCallConnected);
+phone.on('call:disconnected', onCallDisconnected);
+phone.on('call:incoming', onIncomingCall);
+phone.on('call:held', onHeldCall);
+phone.on('call:resumed', onResumedCall);
+phone.on('call:muted', onMutedCall);
+phone.on('call:unmuted', onUnmutedCall);
+
+// Get the domain app token URL
+$.ajax({    
+  type: 'GET',
+ url: myDHS + '/config',
+   success: function(data) {
+       // Get the domain
+       ewebrtc_domain = data.ewebrtc_domain;
+       app_token_url = data.app_token_url;
+       ewebrtcDomainSpan.textContent = ewebrtc_domain;
+
+  },
+  error: onError   
+});
+
+
+function onError(data) {
+    statusLabel.textContent = 'Error: ' + data.error.ErrorMessage;
+}
+
+function login() {
+    // Obtain access token
+
+    $.ajax({    
+        type: 'POST',
+        url: app_token_url, 
+        data: {app_scope: 'ACCOUNT_ID'},
+        success: function(data) {
+            accessToken = data;
+            associateAccessToken();
+        },
+        error: onError
+    });   
+}
+
+function associateAccessToken() {
+    phone.associateAccessToken({
+        userId: UsernameText.value,
+        token: accessToken.access_token,
+        success: function () {
+            // If successful, then log in
+            phone.login({token: accessToken.access_token});
+        },
+        error: onError
+    }); 
+}
+
+function onLoginSuccess(data) {
+    statusLabel.textContent = 'Login successful';
+    callToText.hidden = false; 
+    makeCallButton.hidden = false;
+    endCallButton.hidden = false;
+}
+
+function logout() {
+  phone.logout();
+}
+
+function onLogout() {
+  statusLabel.textContent = 'Logged out';
+}
+
+function makeCall() {
+    phone.dial({
+      destination: phone.cleanPhoneNumber(callToText.value),
+      mediaType: 'video',
+      localMedia: document.getElementById('localVideo'),
+      remoteMedia: document.getElementById('remoteVideo')
+    });
+}
+
+function endCall () {
+  phone.hangup();
+}
+
+function onCallConnected(data) {
+    statusLabel.textContent = 'Call connected from ' + data.from;
+    holdCallButton.hidden = false;
+    resumeCallButton.hidden = false;
+    muteCallButton.hidden = false;
+    unmuteCallButton.hidden = false;
+
+}
+
+function onCallDisconnected(data) {
+    statusLabel.textContent = 'Call disconnected';
+}
+
+function answerCall() {
+    phone.answer({
+      mediaType: 'video',
+      localMedia: document.getElementById('localVideo'),
+      remoteMedia: document.getElementById('remoteVideo')
+    });
+}
+
+function onIncomingCall(data) {
+    answerCallButton.hidden = false;
+    statusLabel.textContent = 'Incoming call from ' + data.from;
+}
+
+
+function holdCall() {
+    phone.hold();
+}
+    
+function resumeCall() {
+    phone.resume();
+} 
+
+function onHeldCall () {
+    statusLabel.textContent = 'Call on hold';
+}        
+
+function onResumedCall () {
+    statusLabel.textContent = 'Call resumed';
+} 
+
+function muteCall() {
+    phone.mute();
+}
+    
+function unmuteCall() {
+    phone.unmute();
+}  
+
+function onMutedCall () {
+    statusLabel.textContent = 'Call muted';
+}        
+
+function onUnmutedCall () {
+    statusLabel.textContent = 'Call unmuted';
+} 
+</script>
+
+</body>
+</html>

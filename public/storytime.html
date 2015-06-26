@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html ng-app="storyTimeApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
+  <script src="storytime.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body ng-controller="storyTimeCtrl" style="font-family:Arial">
+  <h2>Story Time</h2>
+  <div ng-show="status.isConnected" style="float:right; width:300px; border:1px solid black; padding:20px; text-align:justify">
+    <button ng-click="nextPage()" ng-disabled="page == 3" style="float:right">Next Page</button>
+    <button ng-click="previousPage()" ng-disabled="page == 0">Previous Page</button>
+        
+    <hr />
+    <div ng-show="page == 0">
+      <h2>CHAPTER I. Down the Rabbit-Hole</h2>
+      <p>Alice was beginning to get very tired of sitting by her sister on the
+        bank, and of having nothing to do: once or twice she had peeped into the
+        book her sister was reading, but it had no pictures or conversations in
+        it, 'and what is the use of a book,' thought Alice 'without pictures or
+        conversations?'</p>
+      <p>So she was considering in her own mind (as well as she could, for the
+        hot day made her feel very sleepy and stupid), whether the pleasure
+        of making a daisy-chain would be worth the trouble of getting up and
+        picking the daisies, when suddenly a White Rabbit with pink eyes ran
+        close by her.</p>
+    </div>
+    <div ng-show="page == 1">
+      <p>There was nothing so VERY remarkable in that; nor did Alice think it so
+        VERY much out of the way to hear the Rabbit say to itself, 'Oh dear!
+        Oh dear! I shall be late!' (when she thought it over afterwards, it
+        occurred to her that she ought to have wondered at this, but at the time
+        it all seemed quite natural); but when the Rabbit actually TOOK A WATCH
+        OUT OF ITS WAISTCOAT-POCKET, and looked at it, and then hurried on,
+        Alice started to her feet, for it flashed across her mind that she had
+        never before seen a rabbit with either a waistcoat-pocket, or a watch
+        to take out of it, and burning with curiosity, she ran across the field
+        after it , and fortunately was just in time to see it pop down a large
+        rabbit-hole under the hedge.</p>
+      <p>In another moment down went Alice after it,</p>
+    </div>
+    <div ng-show="page == 2">
+      <p>never once considering how in the world she was to get out again.</p>
+      <p>The rabbit-hole went straight on like a tunnel for some way, and then
+        dipped suddenly down, so suddenly that Alice had not a moment to think
+        about stopping herself before she found herself falling down a very deep
+        well.</p>
+      <p>Either the well was very deep, or she fell very slowly, for she had
+        plenty of time as she went down to look about her and to wonder what was
+        going to happen next. First, she tried to look down and make out what
+        she was coming to, but it was too dark to see anything; then she looked 
+        at the sides of the well, and noticed that they were filled with
+        cupboards and book-shelves; here and there she saw maps and</p>
+    </div>
+    <div ng-show="page == 3">
+      <p>pictures hung upon pegs. She took down a jar from one of the shelves as
+        she passed; it was labelled 'ORANGE MARMALADE', but to her great
+        disappointment it was empty: she did not like to drop the jar for fear
+        of killing somebody, so managed to put it into one of the cupboards as
+        she fell past it.</p>
+    </div>
+  </div>
+
+  <p><span>{{statusLabel}}</span></p>
+
+  <p ng-hide="status.isLoggedIn"><input type="text" ng-model="username">@{{att.ewebrtcDomain}}</p>
+
+  <p>
+    <button ng-hide="status.isLoggedIn" ng-click="login()">Login</button>
+    <button ng-show="status.isLoggedIn" ng-click="logout()">Logout</button>
+  </p>
+
+  <p ng-show="status.isLoggedIn">
+    <input ng-show="!status.isConnected" type="text" ng-model="callTo" placeholder="Account ID">
+    <button ng-show="!status.isConnected" ng-click="makeCall()">Make Call</button>
+    <button ng-show="status.isConnected && !status.isOnHold" ng-click="holdCall()">Hold Call</button>
+    <button ng-show="status.isConnected && status.isOnHold" ng-click="resumeCall()">Resume Call</button>
+    <button ng-hide="!status.isConnected" ng-click="endCall()">End Call</button>
+    <button ng-show="status.isIncomingCall" ng-click="answerCall()">Answer Call</button>
+    <button ng-show="status.isConnected && !status.isOnHold && !status.isMuted" ng-click="muteCall()">Mute Call</button>
+    <button ng-show="status.isConnected && !status.isOnHold && status.isMuted" ng-click="unmuteCall()">Unmute Call</button>
+  </p>
+
+  <p ng-show="status.isConnected"> 
+    <video id="remoteVideo" width="320" height="240"></video>
+    <video id="localVideo" width="64" height="48"></video>
+  </p>
+
+  <div style="clear:both; padding-top:10px">
+    <hr />
+    Adapted from Enhanced WebRTC DevLab by AT&T Developer Program.
+  <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="/js/ewebrtc-sdk.min.js"></script>   
+</body>
+</html>
